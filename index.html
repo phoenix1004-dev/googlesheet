@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Sheets Data</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f4;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Google Sheets Data</h1>
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th>Column 1</th>
+          <th>Column 2</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      fetch("http://localhost:3000/get-sheets-data")
+        .then((response) => response.text())
+        .then((data) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data, "text/html");
+          const rows = doc.querySelectorAll("table tbody tr");
+
+          let tableHTML = "";
+          rows.forEach((row) => {
+            tableHTML += "<tr>";
+            const cells = row.querySelectorAll("td");
+            cells.forEach((cell) => {
+              tableHTML += `<td>${cell.innerText}</td>`;
+            });
+            tableHTML += "</tr>";
+          });
+          document.querySelector("#data-table tbody").innerHTML = tableHTML;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          document.body.innerHTML +=
+            "<p>There is an error while fetching data.</p>";
+        });
+    </script>
+  </body>
+</html>
